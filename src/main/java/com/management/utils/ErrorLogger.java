@@ -4,6 +4,7 @@ import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
 
+//Write error
 public class ErrorLogger {
     private BufferedWriter writer;
 
