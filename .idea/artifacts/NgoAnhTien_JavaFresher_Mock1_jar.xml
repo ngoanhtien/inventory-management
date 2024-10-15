@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="jar" build-on-make="true" name="NgoAnhTien_JavaFresher_Mock1:jar">
+    <output-path>$PROJECT_DIR$/..</output-path>
+    <root id="archive" name="NgoAnhTien_JavaFresher_Mock1.jar">
+      <element id="module-output" name="NgoAnhTien_JavaFresher_Mock1" />
+    </root>
+  </artifact>
+</component>

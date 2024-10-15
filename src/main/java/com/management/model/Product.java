@@ -4,7 +4,7 @@ import com.management.utils.ErrorLogger;
 
 import java.util.Set;
 
-public class Product {
+public class Product implements CSVWritable{
     private String id; // Id: bắt buộc, không được trùng
     private String name; // Name: không được để trống
     private double price; // Price: >= 0
@@ -50,7 +50,9 @@ public class Product {
         this.stockAvailable = stockAvailable;
     }
 
-    // Override equals và hashCode nếu cần
-    // ...
+    @Override
+    public String toCSVString() {
+        return String.format("%s,%s,%.2f,%d", id, name, price, stockAvailable);
+    }
 }
 

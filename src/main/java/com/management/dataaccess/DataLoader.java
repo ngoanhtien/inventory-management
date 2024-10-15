@@ -18,9 +18,9 @@ import java.util.*;
 
 //Read and validate data from CSV file
 public class DataLoader {
-    private Map<String, Product> products = new HashMap<>();
-    private Map<String, Customer> customers = new HashMap<>();
-    private Map<String, Order> orders = new HashMap<>();
+    private List<Product> products = new ArrayList<>();
+    private List<Customer> customers = new ArrayList<>();
+    private List<Order> orders = new ArrayList<>();
 
     private ErrorLogger errorLogger;
     private ProductValidator productValidator = new ProductValidator();
@@ -48,7 +48,6 @@ public class DataLoader {
                 String name = columns[1].trim();
                 double price;
                 int stockAvailable;
-
                 try {
                     price = Double.parseDouble(columns[2].trim());
                 } catch (NumberFormatException e) {
@@ -64,16 +63,18 @@ public class DataLoader {
                 }
 
                 Product product = new Product(id, name, price, stockAvailable);
-//                ProductValidator productValidator = new ProductValidator();
                 if (productValidator.validate(product, errorLogger, existingIds)) {
-                    products.put(id, product);
+                    products.add(product);
                 }
             }
         } catch (IOException e) {
             errorLogger.logError("Error reading products file: " + e.getMessage());
+        } finally {
+            if (errorLogger != null) {
+                errorLogger.close();  // Đảm bảo đóng writer sau khi ghi xong
+            }
         }
-
-
+        FileWriterUtil.writeListToFile(products, "D:\\product.output.csv");
     }
 
     public void loadCustomers(String filePath) {
@@ -98,7 +99,7 @@ public class DataLoader {
 
                 Customer customer = new Customer(id, name, email, phoneNumber);
                 if (customerValidator.validate(customer, errorLogger, existingIds, existingEmails, existingPhones)) {
-                    customers.put(id, customer);
+                    customers.add(customer);
                 }
             }
         } catch (IOException e) {
@@ -108,8 +109,15 @@ public class DataLoader {
 
     public void loadOrders(String filePath) {
         Set<String> existingIds = new HashSet<>();
-        Set<String> customerIds = customers.keySet();
-        Set<String> productIds = products.keySet();
+        Set<String> customerIds = new HashSet<>();
+        for (Customer customer : customers) {
+            customerIds.add(customer.getId());
+        }
+
+        Set<String> productIds = new HashSet<>();
+        for (Product product : products) {
+            productIds.add(product.getId());
+        }
 
         try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
             String line;
@@ -117,7 +125,6 @@ public class DataLoader {
 
             while ((line = br.readLine()) != null) {
                 String[] columns = line.split(",");
-
                 if (columns.length != 4) {
                     errorLogger.logError("Invalid order data format: " + line);
                     continue;
@@ -141,7 +148,7 @@ public class DataLoader {
 
                 Order order = new Order(id, customerId, productQuantities, orderDate);
                 if (orderValidator.validate(order, errorLogger, existingIds, customerIds, productIds)) {
-                    orders.put(id, order);
+                    orders.add(order);
                 }
             }
         } catch (IOException e) {
@@ -174,15 +181,15 @@ public class DataLoader {
         return productQuantities;
     }
 
-    public Map<String, Product> getProducts() {
-        return products;
-    }
-
-    public Map<String, Customer> getCustomers() {
+    public List<Customer> getCustomers() {
         return customers;
     }
 
-    public Map<String, Order> getOrders() {
+    public List<Product> getProducts() {
+        return products;
+    }
+
+    public List<Order> getOrders() {
         return orders;
     }
 }

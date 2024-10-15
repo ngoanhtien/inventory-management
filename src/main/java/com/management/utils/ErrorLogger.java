@@ -30,4 +30,18 @@ public class ErrorLogger {
             e.printStackTrace();
         }
     }
+
+    public static void main(String[] args) {
+        ErrorLogger errorLogger = null;
+        try {
+            errorLogger = new ErrorLogger("D:\\error.output.csv");
+            errorLogger.logError("ABC");
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        } finally {
+            if (errorLogger != null) {
+                errorLogger.close();  // Đảm bảo đóng writer sau khi ghi xong
+            }
+        }
+    }
 }
